@@ -15,7 +15,182 @@
       
       <img src="https://raw.githubusercontent.com/alexalexalex25/CSP-Website/main/Mannequin.PNG" height="400" alt="centered image" class="aligncenter">
       <br>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.9.5/brython.min.js"></script>
+    <title>Your Game</title>
+    <style>
+        canvas {
+            border: 1px solid black; /* Optional: to see the canvas border */
+        }
+    </style>
+</head>
+<body onload="brython()">
+
+<canvas id="gameCanvas" width="1200" height="1000"></canvas>
+
+<script type="text/python">
+    from browser import document, html
+    import turtle as trtl
+    import random as rand
+
+    # Setup
+    wn = trtl.Screen()
+    wn.setup(width=1200, height=1000)
+    wn.bgcolor('white')  # Fallback color if the image doesn't load
+
+    # Load your images (replace with URLs)
+    wn.addshape("https://raw.githubusercontent.com/alexalexalex25/CSP-Website/refs/heads/main/backgroundpvz.gif")
+    wn.addshape("https://raw.githubusercontent.com/alexalexalex25/CSP-Website/refs/heads/main/peashooter-removebg-preview-_2_.gif")
+    wn.addshape(https://raw.githubusercontent.com/alexalexalex25/CSP-Website/refs/heads/main/pea2-removebg-preview%20(1).gif")
+    wn.addshape("https://raw.githubusercontent.com/alexalexalex25/CSP-Website/refs/heads/main/ZOKMB_E-removebg-preview%20(1).gif")
+    wn.addshape("https://raw.githubusercontent.com/alexalexalex25/CSP-Website/refs/heads/main/cone.gif")
+
+    # Peashooter turtle
+    ps = trtl.Turtle()
+    ps.shape("https://raw.githubusercontent.com/alexalexalex25/CSP-Website/refs/heads/main/peashooter-removebg-preview-_2_.gif")
+    ps.penup()
+    ps.right(90)
+    ps.goto(-380, 0)
+
+    # Pea turtles
+    p = trtl.Turtle()
+    p.shape("https://raw.githubusercontent.com/alexalexalex25/CSP-Website/refs/heads/main/pea2-removebg-preview%20(1).gif")
+    p.penup()
+    p.hideturtle()
+    p.goto(-320, 10)
+
+    # Zombies
+    zombie = trtl.Turtle()
+    z2 = trtl.Turtle()
+    zombie.penup()
+    z2.penup()
+    zombie.goto(330, 0)
+    z2.goto(330, 0)
+    zombie.shape("https://raw.githubusercontent.com/alexalexalex25/CSP-Website/refs/heads/main/ZOKMB_E-removebg-preview%20(1).gif")
+    z2.shape("https://raw.githubusercontent.com/alexalexalex25/CSP-Website/refs/heads/main/cone.gif")
+    x = 0
+    zombies = [zombie, z2]
+
+    # Score
+    gamescore = 0
+    score = trtl.Turtle()
+    score.hideturtle()
+    score.penup()
+    score.goto(300, 370)
+
+    def scorewrite():
+        global gamescore
+        score.clear()
+        score.write('Score=' + str(gamescore), align="center", font=("Arial", 16, "normal"))
     
+    scorewrite()
+
+    # Movement and firing functions
+    y = 0
+    timew = 0
+
+    def up():
+        global timew, y
+        if timew == 0:
+            timew = 1
+            ps.backward(100)
+            y += 100
+            timew = 0
+
+    times = 0
+
+    def down():
+        global times, y
+        if times == 0:
+            times = 1
+            ps.forward(100)
+            y -= 100
+            times = 0
+        p.goto(-512, y + 10)
+
+    time = 0
+    zpick = 0
+
+    def shoot():
+        global gamescore, x, time, zpick
+        if time == 0:
+            time = 1
+            p.speed(3)
+            p.goto(-320, y + 10)
+            p.showturtle()
+            for i in range(1, 65):
+                if p.distance(zombies[zpick]) < 12:
+                    zombies[zpick].hideturtle()
+                    p.hideturtle()
+                    rr = rand.randint(0, 4)
+                    zombies[zpick].goto(330, -200 + 100 * rr)
+                    zombies[zpick].showturtle()
+                    zpick = rand.randint(0, 1)
+                    gamescore += 1
+                    scorewrite()
+                else:
+                    p.forward(10)
+            p.hideturtle()
+            p.speed(0)
+            p.goto(-512, y + 10)
+            p.speed(3)
+            time = 0
+
+    wn.listen()
+    wn.onkeypress(up, 'w')
+    wn.onkeypress(down, 's')
+    wn.onkeypress(shoot, '1')
+
+    def drawlose():
+        lose = trtl.Turtle()
+        lose.penup()
+        lose.hideturtle()
+        lose.goto(0, 400)
+        lose.color('red')
+        lose.write("ZOMBIES ATE YOUR BRAINS!", align="center", font=("Arial", 45, "normal"))
+
+    zdead = False
+    x = 1
+
+    def zattack():
+        global x, zdead, zpick
+        while x == 1:
+            for i in range(1, 130):
+                if p.distance(zombies[zpick]) < 12:
+                    zpick = rand.randint(0, 1)
+                    break
+                elif p.distance(zombies[zpick]) > 12 and zombies[zpick].xcor() > -420:
+                    zombies[zpick].forward(-10)
+                elif zombies[zpick].xcor() == -420:
+                    zombies[zpick].speed(1)
+                    zombies[zpick].goto(-500, -25)
+                    zombies[zpick].goto(-580, -25)
+                    x = 3
+                    drawlose()
+                    break
+
+    names = trtl.Turtle()
+    names.penup()
+    names.goto(300, -400)
+    names.write('By Jaden and Alex', align="center", font=("Arial", 20, "normal"))
+    
+    controls = trtl.Turtle()
+    controls.penup()
+    controls.goto(-300, -460)
+    controls.write('w=up\ns=down\n1=fire\nTurn off Caps Lock', align="center", font=("Arial", 20, "normal"))
+
+    zattack()
+    
+    trtl.done()
+</script>
+
+</body>
+</html>
+
     </center>
 	  
 	
